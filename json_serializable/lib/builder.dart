@@ -24,6 +24,7 @@ import 'src/json_part_builder.dart';
 Builder jsonSerializable(BuilderOptions options) {
   try {
     final config = JsonSerializable.fromJson(options.config);
+
     return jsonPartBuilder(config: config);
   } on CheckedFromJsonException catch (e) {
     final lines = <String>[

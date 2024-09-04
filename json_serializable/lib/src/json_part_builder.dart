@@ -53,14 +53,15 @@ class _UnifiedGenerator extends Generator {
   @override
   Future<String?> generate(LibraryReader library, BuildStep buildStep) async {
     final values = <String>{};
-
+    // print('JsonPartBuilder generate: ');
     for (var generator in _generators) {
       for (var annotatedElement
           in library.annotatedWith(generator.typeChecker)) {
         await pubspecHasRightVersion(buildStep);
-
+        // print('Annotated Element: ${annotatedElement.annotation.objectValue.type?.element?.name}');
         final generatedValue = generator.generateForAnnotatedElement(
             annotatedElement.element, annotatedElement.annotation, buildStep);
+        // print(generatedValue.toString());
         for (var value in _normalizeGeneratorOutput(generatedValue)) {
           assert(value.length == value.trim().length);
           values.add(value);

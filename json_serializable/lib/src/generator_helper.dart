@@ -50,7 +50,7 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
         'ignored.',
       );
     }
-
+    // print('All Helpers: ${_generator.allHelpers..forEach((element) {element.toString();})}');
     final sortedFields = createSortedFieldSet(element);
 
     // Used to keep track of why a field is ignored. Useful for providing
@@ -80,10 +80,11 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
         return map;
       },
     );
-
+    // print("Accessible fields: ${accessibleFields.toString()}");
     var accessibleFieldSet = accessibleFields.values.toSet();
     if (config.createFactory) {
       final createResult = createFactory(accessibleFields, unavailableReasons);
+      // print("create Result: ${createResult.output}");
       yield createResult.output;
 
       final fieldsToUse = accessibleFields.entries
@@ -128,19 +129,25 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
         },
       );
 
+    print("Accessible field set: ${accessibleFieldSet}");
+
     if (config.createFieldMap) {
+      print("Field Map: ${createFieldMap(accessibleFieldSet)}");
       yield createFieldMap(accessibleFieldSet);
     }
 
     if (config.createJsonKeys) {
+      print("Json Keys: ${createJsonKeys(accessibleFieldSet)}");
       yield createJsonKeys(accessibleFieldSet);
     }
 
     if (config.createPerFieldToJson) {
+      print("Per field to Json: ${createPerFieldToJson(accessibleFieldSet)}");
       yield createPerFieldToJson(accessibleFieldSet);
     }
 
     if (config.createToJson) {
+      print("To Json: ${createToJson(accessibleFieldSet)}");
       yield* createToJson(accessibleFieldSet);
     }
 

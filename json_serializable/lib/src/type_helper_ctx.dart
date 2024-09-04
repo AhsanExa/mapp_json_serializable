@@ -50,11 +50,22 @@ class TypeHelperCtx
   }
 
   @override
-  Object? serialize(DartType targetType, String expression) => _run(
-        targetType,
-        expression,
-        (TypeHelper th) => th.serialize(targetType, expression, this),
-      );
+  Object? serialize(DartType targetType, String expression) {
+    Object onj = _run(
+      targetType,
+      expression,
+          (TypeHelper th) {
+            Object? tHelper = th.serialize(targetType, expression, this);
+            print("Target type: ${targetType}");
+            print("Expression: ${expression}");
+            print("TypeHelpers: ${this.fieldElement}");
+            print("TypeHelper Object on serialize: ${tHelper}");
+            return tHelper;
+          }
+    );
+    // print("Object on serialize: ${onj.toString()}");
+    return onj;
+  }
 
   @override
   Object deserialize(

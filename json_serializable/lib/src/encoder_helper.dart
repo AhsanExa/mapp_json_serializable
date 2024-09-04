@@ -89,13 +89,17 @@ mixin EncodeHelper implements HelperCore {
     assert(config.createToJson);
 
     final buffer = StringBuffer();
-
+    // print("Prefix: ${prefix}");
+    // print("Generic class argument: ${genericClassArgumentsImpl(withConstraints: true)}");
     final functionName =
         '${prefix}ToJson${genericClassArgumentsImpl(withConstraints: true)}';
     buffer.write('Map<String, dynamic> '
         '$functionName($targetClassReference $_toJsonParamName');
 
-    if (config.genericArgumentFactories) _writeGenericArgumentFactories(buffer);
+    if (config.genericArgumentFactories) {
+      print("Has genericArgumentFactories");
+      _writeGenericArgumentFactories(buffer);
+    }
 
     buffer.write(') ');
 
@@ -118,6 +122,7 @@ mixin EncodeHelper implements HelperCore {
       final helperName = toJsonForType(
         arg.instantiate(nullabilitySuffix: NullabilitySuffix.none),
       );
+      print("Encoder Helper: helper: $helperName");
       buffer.write(',Object? Function(${arg.name} value) $helperName');
     }
     if (element.typeParameters.isNotEmpty) {
@@ -130,8 +135,18 @@ mixin EncodeHelper implements HelperCore {
       ..writeln('=> <String, dynamic>{')
       ..writeAll(fields.map((field) {
         final access = _fieldAccess(field);
-        final value =
-            '${safeNameAccess(field)}: ${_serializeField(field, access)}';
+        print('Access: $access');
+        print("MetaData: ");
+
+        bool? hasTestConverter = field.getter?.metadata?.any((element) => element.element?.enclosingElement?.name=='TestConverter')??false;
+
+        String value = "";
+        if(hasTestConverter){
+          value = '...${_serializeField(field, access)}';
+        }else {
+          value = '${safeNameAccess(field)}: ${_serializeField(field, access)}';
+        }
+
         return '        $value,\n';
       }))
       ..writeln('};');
@@ -202,9 +217,14 @@ mixin EncodeHelper implements HelperCore {
 
   String _serializeField(FieldElement field, String accessExpression) {
     try {
-      return getHelperContext(field)
+      String st = getHelperContext(field)
           .serialize(field.type, accessExpression)
           .toString();
+      // print("Field type: ${field.type}");
+      // print("Helper Context: ${getHelperContext(field).runtimeType}");
+      // print("Access Expression: ${accessExpression}");
+      print("Serialized field: $st");
+      return st;
     } on UnsupportedTypeError catch (e) // ignore: avoid_catching_errors
     {
       throw createInvalidGenerationError('toJson', field, e);
