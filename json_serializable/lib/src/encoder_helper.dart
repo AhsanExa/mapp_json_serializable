@@ -97,7 +97,6 @@ mixin EncodeHelper implements HelperCore {
         '$functionName($targetClassReference $_toJsonParamName');
 
     if (config.genericArgumentFactories) {
-      print("Has genericArgumentFactories");
       _writeGenericArgumentFactories(buffer);
     }
 
@@ -122,7 +121,7 @@ mixin EncodeHelper implements HelperCore {
       final helperName = toJsonForType(
         arg.instantiate(nullabilitySuffix: NullabilitySuffix.none),
       );
-      print("Encoder Helper: helper: $helperName");
+      // print("Encoder Helper: helper: $helperName");
       buffer.write(',Object? Function(${arg.name} value) $helperName');
     }
     if (element.typeParameters.isNotEmpty) {
@@ -131,19 +130,22 @@ mixin EncodeHelper implements HelperCore {
   }
 
   void _writeToJsonSimple(StringBuffer buffer, Iterable<FieldElement> fields) {
+
     buffer
       ..writeln('=> <String, dynamic>{')
       ..writeAll(fields.map((field) {
         final access = _fieldAccess(field);
-        print('Access: $access');
-        print("MetaData: ");
+        // print('Access: $access');
+        // print("MetaData: ");
 
-        bool? hasTestConverter = field.getter?.metadata?.any((element) => element.element?.enclosingElement?.name=='TestConverter')??false;
+        bool? hasUnpackConverter = field.getter?.metadata
+                .any((element) => element.element?.name == 'unpackConverter') ??
+            false;
 
-        String value = "";
-        if(hasTestConverter){
-          value = '...${_serializeField(field, access)}';
-        }else {
+        var value = '';
+        if (hasUnpackConverter) {
+          value = field.type.isNullableType? '...?$access':'...$access';
+        } else {
           value = '${safeNameAccess(field)}: ${_serializeField(field, access)}';
         }
 
@@ -188,6 +190,10 @@ mixin EncodeHelper implements HelperCore {
               '    $generatedLocalVarName[$safeJsonKeyString] = $expression;');
         }
       } else {
+        bool? hasUnpackConverter = field.getter?.metadata
+                .any((element) => element.element?.name == 'unpackConverter') ??
+            false;
+
         if (directWrite) {
           // close the still-open map literal
           buffer
@@ -199,7 +205,10 @@ mixin EncodeHelper implements HelperCore {
             ..writeln('''
     void $toJsonMapHelperName(String key, dynamic value) {
       if (value != null) {
-        $generatedLocalVarName[key] = value;
+        ${hasUnpackConverter
+            ? '$generatedLocalVarName.addAll(value);'
+            : '$generatedLocalVarName[key] = value;'
+        }
       }
     }
 ''');
@@ -217,14 +226,12 @@ mixin EncodeHelper implements HelperCore {
 
   String _serializeField(FieldElement field, String accessExpression) {
     try {
-      String st = getHelperContext(field)
+      return getHelperContext(field)
           .serialize(field.type, accessExpression)
           .toString();
       // print("Field type: ${field.type}");
       // print("Helper Context: ${getHelperContext(field).runtimeType}");
       // print("Access Expression: ${accessExpression}");
-      print("Serialized field: $st");
-      return st;
     } on UnsupportedTypeError catch (e) // ignore: avoid_catching_errors
     {
       throw createInvalidGenerationError('toJson', field, e);

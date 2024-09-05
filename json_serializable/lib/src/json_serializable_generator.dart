@@ -78,7 +78,7 @@ class JsonSerializableGenerator
     // print('JsonSerializableGenerator: generateForAnnotatedElement');
     // print('Element: ');
     // element.fields..forEach((element) {print('$element => ${element.getter?.metadata?..forEach((element) { element;})}');});
-    print('Annotation:  ${annotation.objectValue.type?.toString()}');
+    // print('Annotation:  ${annotation.objectValue.type?.toString()}');
     final helper = GeneratorHelper(_settings, element, annotation);
     return helper.generate();
   }

@@ -28,6 +28,8 @@ dependencies:
   pubspec_parse: ^1.0.0
   source_gen: ^1.3.2
   source_helper: ^1.3.0
+  extra_json_annotation:
+   path: ../../extra_json_annotation
 
 dev_dependencies:
   _json_serial_shared_test:

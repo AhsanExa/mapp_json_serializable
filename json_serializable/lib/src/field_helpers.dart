@@ -78,7 +78,7 @@ List<FieldElement> createSortedFieldSet(ClassElement element) {
   final elementInstanceFields = Map.fromEntries(
       element.fields.where((e) => !e.isStatic).map((e) => MapEntry(e.name, e)));
 
-  print("ElementinstanceFields: ${elementInstanceFields.toString()}");
+  // print("ElementinstanceFields: ${elementInstanceFields.toString()}");
 
   final inheritedFields = <String, FieldElement>{};
   final manager = InheritanceManager3();
@@ -101,7 +101,7 @@ List<FieldElement> createSortedFieldSet(ClassElement element) {
   final allFields =
       elementInstanceFields.keys.toSet().union(inheritedFields.keys.toSet());
 
-  print("All fields: ${elementInstanceFields.toString()}");
+  // print("All fields: ${elementInstanceFields.toString()}");
 
   final fields = allFields
       .map((e) => _FieldSet(elementInstanceFields[e], inheritedFields[e]))
