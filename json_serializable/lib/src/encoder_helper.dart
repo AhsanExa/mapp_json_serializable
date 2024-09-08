@@ -130,21 +130,22 @@ mixin EncodeHelper implements HelperCore {
   }
 
   void _writeToJsonSimple(StringBuffer buffer, Iterable<FieldElement> fields) {
-
     buffer
       ..writeln('=> <String, dynamic>{')
       ..writeAll(fields.map((field) {
         final access = _fieldAccess(field);
-        // print('Access: $access');
-        // print("MetaData: ");
-
-        bool? hasUnpackConverter = field.getter?.metadata
-                .any((element) => element.element?.name == 'unpackConverter') ??
+        print('Access: $access');
+        print("MetaData: ");
+        field.getter?.metadata.forEach((element) {
+          print(element);
+        });
+        bool? hasUnpackConverter = field.getter?.metadata.any(
+                (element) => element.toString().contains('UnpackConverter')) ??
             false;
 
         var value = '';
         if (hasUnpackConverter) {
-          value = field.type.isNullableType? '...?$access':'...$access';
+          value = field.type.isNullableType ? '...?$access' : '...$access';
         } else {
           value = '${safeNameAccess(field)}: ${_serializeField(field, access)}';
         }
@@ -190,8 +191,8 @@ mixin EncodeHelper implements HelperCore {
               '    $generatedLocalVarName[$safeJsonKeyString] = $expression;');
         }
       } else {
-        bool? hasUnpackConverter = field.getter?.metadata
-                .any((element) => element.element?.name == 'unpackConverter') ??
+        bool? hasUnpackConverter = field.getter?.metadata.any(
+                (element) => element.toString().contains('UnpackConverter')) ??
             false;
 
         if (directWrite) {
@@ -205,10 +206,7 @@ mixin EncodeHelper implements HelperCore {
             ..writeln('''
     void $toJsonMapHelperName(String key, dynamic value) {
       if (value != null) {
-        ${hasUnpackConverter
-            ? '$generatedLocalVarName.addAll(value);'
-            : '$generatedLocalVarName[key] = value;'
-        }
+        ${hasUnpackConverter ? '$generatedLocalVarName.addAll(value);' : '$generatedLocalVarName[key] = value;'}
       }
     }
 ''');
